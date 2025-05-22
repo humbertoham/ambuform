@@ -46,17 +46,20 @@ export default function ReportForm() {
     respiratoryNoise:'',
     aux:'',
     medicine:'',
+    pupile:'',
     medicineHour:'',
     medicineDosis:'',
     oxi:'',
     codeTras:'',
     hospital:'',
     medRec:'',
+    o2:'',
     serviceC:'',
     serviceM:'',
     operator:'',
     tUM1:'',
     tUM2:'',
+    skin:''
   });
   const sigCanvasRef = useRef<SignatureCanvas>(null);
 // Refs
@@ -91,6 +94,9 @@ const [isDrawing, setIsDrawing] = useState(false);
     const page = pdfDoc.getPages()[0];
     const { width, height } = page.getSize();
 
+    const page2 = pdfDoc.getPages()[1];
+   const { width:w2, height:h2 } = page2.getSize();
+
     // 3. Embed a font
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
@@ -104,7 +110,7 @@ let currentY = height - margin - logoHeight;
 
 
 // Add title
-currentY -= 70; // Space after logo
+currentY -= 15; // Space after logo
 page.drawText('AmbulanciasTVR - Reporte Médico', {
   x: margin,
   y: currentY,
@@ -198,7 +204,7 @@ const additionalData = [
   [`Tipo de llamada: ${formData.callType}`, `Estado Civil: ${formData.civilStatus}`],
   [`Derechohabiente: ${formData.beneficiary}`, `Profesión: ${formData.profession}`],
   [`Adulto responsable: ${formData.responsibleAdult}`, `Relación: ${formData.relationship}`],
-  [`Teléfono: ${formData.phone}`, `Oximetría: ${formData.vitals}%`],
+  [`Teléfono: ${formData.phone}`, "" ],
 ];
 
 
@@ -207,12 +213,11 @@ additionalData.forEach(([left, right]) => {
 });
 
 
-currentY = addSectionTitle('Información Adicional', currentY - 20);
+currentY = addSectionTitle('Signos Vitales', currentY - 20);
 const additionalDato = [
-  [`Tipo de llamada: ${formData.callType}`, `Estado Civil: ${formData.civilStatus}`],
-  [`Derechohabiente: ${formData.beneficiary}`, `Profesión: ${formData.profession}`],
-  [`Adulto responsable: ${formData.responsibleAdult}`, `Relación: ${formData.relationship}`],
-  [`Teléfono: ${formData.phone}`, `Oximetría: ${formData.vitals}`],
+  [`Presión Arterial: ${formData.arterialPress}`, `Pulso: ${formData.pulse}`],
+  [`Oximetría: ${formData.oxi}%`, `Temperatura: ${formData.temperature}`],
+  [`Alergias: ${formData.alergies}`, `Respiración: ${formData.respiration}`],
 ];
 
 
@@ -223,13 +228,185 @@ additionalDato.forEach(([left, right]) => {
 // Continue with other sections using similar pattern...
 
 // Add footer
-page.drawText('Confidential Medical Document', {
+page.drawText('Documento Médico Confidencial', {
   x: margin,
   y: 40,
   size: 10,
   font: helveticaFont,
   color: rgb(0.5, 0.5, 0.5),
 });
+
+
+
+
+
+
+
+
+
+
+
+// page 2
+const logoHeight2 = 50;
+const margin2 = 50;
+let currentY2 = h2 - margin - logoHeight;
+
+
+
+// Add title
+currentY2 -= 15; // Space after logo
+page2.drawText('AmbulanciasTVR - Reporte Médico', {
+  x: margin,
+  y: currentY2,
+  size: 24,
+  font: helveticaFont,
+  color: rgb(0, 0.2, 0.4), // Dark blue color
+});
+
+// Add decorative line under title
+currentY2 -= 20;
+page2.drawLine({
+  start: { x: margin, y: currentY2 },
+  end: { x: w2 - margin, y: currentY2 },
+  thickness: 2,
+  color: rgb(0, 0.2, 0.4),
+});
+
+// Section styles
+const sectionTitleStyle2 = {
+  font: helveticaFont,
+  size: 14,
+  color: rgb(0, 0.2, 0.4),
+};
+const subsectionTitleStyle2 = {
+  font: helveticaFont,
+  size: 12,
+};
+const normalTextStyle2 = {
+  font: helveticaFont,
+  size: 12,
+};
+
+// Create helper function for section titles
+const addSectionTitle2 = (text:any, y:any) => {
+  page2.drawText(text, { ...sectionTitleStyle2, x: margin, y });
+  return y - 30; // Return new Y position
+};
+
+// Create two-column layout helper
+interface TwoColumnOptions {
+  spacing?: number;
+  rightX?: number;
+  style?: any; // Replace 'any' with your specific text style type if available
+}
+
+const twoColumns2 = (
+  leftText: string,
+  rightText: string,
+  y: number,
+  opts: TwoColumnOptions = {}
+) => {
+  const rightX = opts.rightX ?? w2 - margin - 200;
+  page2.drawText(leftText, { ...opts.style, x: margin, y });
+  page2.drawText(rightText, { ...opts.style, x: rightX, y });
+  return y - (opts.spacing ?? 20);
+};
+
+// Additional Data Section with grid layout
+currentY2 = addSectionTitle2('Estado del Paciente', currentY2 - 20);
+const additionalDatas = [
+  [`Piel: ${formData.skin}`, `Respiración: ${formData.respiration}`],
+  [`Hemorragias: ${formData.bleeding}`, `Dolor: ${formData.pain}`],
+  [`Prioridad: ${formData.priority}`, ``],
+  [`Molestia Principal: ${formData.principal}`, "" ],
+  [`Descripción: ${formData.description}`, "" ],
+];
+
+
+additionalDatas.forEach(([left, right]) => {
+  currentY2 = twoColumns2(left, right, currentY2, { style: normalTextStyle });
+});
+currentY2 = addSectionTitle2('Primeros Auxilios', currentY2 - 20);
+const parte2 = [
+  [`Nivel de Conciencia: ${formData.conLevel}`, `Ruidos Respiratorios: ${formData.respiratoryNoise}`],
+  [`Pupilas: ${formData.pupile}`, `O2: ${formData.o2}`],
+  [`Dosis: ${formData.medicineDosis}` ,`Hora: ${formData.medicineHour}` ],
+  [`Medicamentos: ${formData.medicine}`, ``],
+  [`Primeros Auxilios: ${formData.aux}`, ``],
+];
+
+
+parte2.forEach(([left, right]) => {
+  currentY2 = twoColumns2(left, right, currentY2, { style: normalTextStyle });
+});
+
+currentY2 = addSectionTitle2('Hospital', currentY2 - 20);
+const hospital = [
+  [`Hospital: ${formData.hospital}`, `Médico Receptor: ${formData.medRec}`],
+  [`Código de Traslado: ${formData.codeTras}`, ``],
+  
+  
+];
+
+
+hospital.forEach(([left, right]) => {
+  currentY2 = twoColumns2(left, right, currentY2, { style: normalTextStyle });
+});
+
+currentY2 = addSectionTitle2('Personal', currentY2 - 20);
+const personal = [
+  [`Jefe de Servicios: ${formData.serviceC}`, `T.UM: ${formData.tUM1}`],
+  [`T.UM: ${formData.tUM2}`, `Médico: ${formData.serviceM}`],
+  [`Operador: ${formData.medicineDosis}` ,`` ],
+
+];
+
+
+personal.forEach(([left, right]) => {
+  currentY2 = twoColumns2(left, right, currentY2, { style: normalTextStyle });
+});
+
+// Continue with other sections using similar pattern...
+
+// Add footer
+page2.drawText('Documento Médico Confidencial', {
+  x: margin,
+  y: 40,
+  size: 10,
+  font: helveticaFont,
+  color: rgb(0.5, 0.5, 0.5),
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // 5. Embed signature image if exists
     const canvas = sigCanvasRef.current;
@@ -238,8 +415,8 @@ page.drawText('Confidential Medical Document', {
       const sigBytes = await fetch(sigDataUrl).then(res => res.arrayBuffer());
       const sigImage = await pdfDoc.embedPng(sigBytes);
       const sigDims = sigImage.scale(0.5);
-      page.drawImage(sigImage, {
-        x: width - sigDims.width - 50,
+      page2.drawImage(sigImage, {
+        x: width - sigDims.width - 120,
         y: 50,
         width: sigDims.width,
         height: sigDims.height,
@@ -367,16 +544,28 @@ page.drawText('Confidential Medical Document', {
         <label className="flex flex-col"><span>Pulso</span><input type="number" inputMode="numeric" pattern="[0-9]*" name='pulse' onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Oximetría</span><input type="number" inputMode="numeric" pattern="[0-9]*" name='oxi'  onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Temperatura</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="temperature" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col "><span>Respiración</span><input type="text" name="respiration" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col "><span>Alergias</span><input type="text" name="address" onChange={handleChange} className="p-2 border rounded" /></label>
-        
-        <label className="flex flex-col"><span>Respiración</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Normal</option><option value="Superficial">Superficial</option></select></label>
-        <label className="flex flex-col"><span>Hemorragias</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Ninguna</option><option value="Min.">Min.</option><option value="Mod.">Mod.</option><option value="Sev.">Sev.</option></select></label>
-        <label className="flex flex-col"><span>Dolor</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Ninguna</option><option value="Min.">Min.</option><option value="Mod.">Mod.</option><option value="Sev.">Sev.</option></select></label>
+        <label className="flex flex-col "><span>Alergias</span><input type="text" name="alergies" onChange={handleChange} className="p-2 border rounded" /></label>
+       </div>
+       
+        <fieldset className="mb-4">
+        <legend className="font-semibold">Piel</legend>
+        <div className="flex flex-wrap gap-4">
+          {['Normal','Caliente','Fría','Pálida','Ruborizada','Cianótica'].map(opt => (
+            <label key={opt} className="flex items-center">
+              <input type="radio" name="skin" value={opt} onChange={handleChange} className="mr-2" />{opt}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+       
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <label className="flex flex-col"><span>Respiración</span><select name="respiration" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Normal</option><option value="Superficial">Superficial</option></select></label>
+        <label className="flex flex-col"><span>Hemorragias</span><select name="bleeding" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Ninguna</option><option value="Min.">Min.</option><option value="Mod.">Mod.</option><option value="Sev.">Sev.</option></select></label>
+        <label className="flex flex-col"><span>Dolor</span><select name="pain" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Ninguna</option><option value="Min.">Min.</option><option value="Mod.">Mod.</option><option value="Sev.">Sev.</option></select></label>
       
-        <label className="flex flex-col "><span>Prioridad</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Rojo">Rojo</option><option value="Amarillo">Amarillo</option><option value="Verde">Verde</option><option value="Negro">Negro</option></select></label>
-          <label className="flex flex-col  md:col-span-2"><span>Molestia Principal</span><input type="text" name="address" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col  md:col-span-2"><span>Descripción de la lesión</span><input type="text" name="address" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col "><span>Prioridad</span><select name="priority" onChange={handleChange} className="p-2 border rounded"><option value="Rojo">Rojo</option><option value="Amarillo">Amarillo</option><option value="Verde">Verde</option><option value="Negro">Negro</option></select></label>
+          <label className="flex flex-col  md:col-span-2"><span>Molestia Principal</span><input type="text" name="principal" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col  md:col-span-2"><span>Descripción de la lesión</span><input type="text" name="description" onChange={handleChange} className="p-2 border rounded" /></label>
         
       </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
@@ -386,36 +575,36 @@ page.drawText('Confidential Medical Document', {
         <div className="flex flex-wrap gap-4">
           {['Alerta','Responde al estimulo verbal','Respondo al estimulo doloroso','No responde'].map(opt => (
             <label key={opt} className="flex items-center">
-              <input type="radio" name="beneficiary" value={opt} onChange={handleChange} className="mr-2" />{opt}
+              <input type="radio" name="conLevel" value={opt} onChange={handleChange} className="mr-2" />{opt}
             </label>
           ))}
         </div>
       </fieldset>
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <label className="flex flex-col"><span>Ruidos Respiratorios</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normales">Normales</option><option value="Estertores">Estertores</option><option value="Estridor">Estridor</option><option value="Roncus">Roncus</option><option value="Sibilancias">Sibilancias</option></select></label>
-        <label className="flex flex-col"><span>Pupilas</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normales">Normales</option><option value="Dilatadas">Dilatadas</option><option value="Contraidas">Contraidas</option><option value="Asimétricas">Asimétricas</option></select></label>
+        <label className="flex flex-col"><span>Ruidos Respiratorios</span><select name="respiratoryNoise" onChange={handleChange} className="p-2 border rounded"><option value="Normales">Normales</option><option value="Estertores">Estertores</option><option value="Estridor">Estridor</option><option value="Roncus">Roncus</option><option value="Sibilancias">Sibilancias</option></select></label>
+        <label className="flex flex-col"><span>Pupilas</span><select name="pupile" onChange={handleChange} className="p-2 border rounded"><option value="Normales">Normales</option><option value="Dilatadas">Dilatadas</option><option value="Contraidas">Contraidas</option><option value="Asimétricas">Asimétricas</option></select></label>
 
-   <label className="flex flex-col md:col-span-2"><span>Primeros Auxilios</span><input type="text" placeholder='R.C.P, Vendajes, ETC...' name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
-   <label className="flex flex-col"><span>O2</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="No">No</option><option value="Sí">Sí</option></select></label>
-  <label className="flex flex-col"><span>Medicamentos</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col"><span>Dosis</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col"><span>Hora</span><input type="time" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+   <label className="flex flex-col md:col-span-2"><span>Primeros Auxilios</span><input type="text" placeholder='R.C.P, Vendajes, ETC...' name="aux" onChange={handleChange} className="p-2 border rounded" /></label>
+   <label className="flex flex-col"><span>O2</span><select name="o2" onChange={handleChange} className="p-2 border rounded"><option value="No">No</option><option value="Sí">Sí</option></select></label>
+  <label className="flex flex-col"><span>Medicamentos</span><input type="text" name="medicine" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Dosis</span><input type="text" name="medicineDosis" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Hora</span><input type="time" name="medicineHour" onChange={handleChange} className="p-2 border rounded" /></label>
         
-        <label className="flex flex-col"><span>Código de traslado al Hospital</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Código de traslado al Hospital</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="codeTras" onChange={handleChange} className="p-2 border rounded" /></label>
 
-<label className="flex flex-col"><span>Hospital</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+<label className="flex flex-col"><span>Hospital</span><input type="text" name="hospital" onChange={handleChange} className="p-2 border rounded" /></label>
 
 </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             
-        <label className="flex flex-col"><span>Jefe de Servicios</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Jefe de Servicios</span><input type="text" name="serviceC" onChange={handleChange} className="p-2 border rounded" /></label>
 
-        <label className="flex flex-col"><span>T. UM</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>T. UM</span><input type="text" name="tUM1" onChange={handleChange} className="p-2 border rounded" /></label>
 
-        <label className="flex flex-col"><span>T. UM</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col"><span>Médico</span><input type="text" name="relationship" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col"><span>Operador</span><input type="text"  name="phone" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>T. UM</span><input type="text" name="tUM2" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Médico</span><input type="text" name="serviceM" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Operador</span><input type="text"  name="operator" onChange={handleChange} className="p-2 border rounded" /></label>
       </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
 
@@ -429,7 +618,7 @@ page.drawText('Confidential Medical Document', {
   penColor="black"
   ref={sigCanvasRef}
   canvasProps={{
-    width: 500, // definido en píxeles
+    width: 300, // definido en píxeles
     height: 200,
     className: 'border rounded'
   }}
