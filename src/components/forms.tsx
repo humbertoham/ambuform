@@ -21,6 +21,42 @@ export default function ReportForm() {
     address: '',
     age: '',
     sex: 'M',
+    bloodType:'',
+    callType:'',
+    civilStatus:'',
+    profession:'',
+    relationship:'',
+    beneficiary:'',
+    vitals:'',
+    phone:'',
+    responsibleAdult:'',
+    pacientStatus:'',
+    respiration:'',
+    bleeding:'',
+    pain:'',
+    priority:'',
+    principal:'',
+    description:'',
+    temperature:'',
+    pulse:'',
+    autoAccident:'',
+    arterialPress:'',
+    alergies:'',
+    conLevel:'',
+    respiratoryNoise:'',
+    aux:'',
+    medicine:'',
+    medicineHour:'',
+    medicineDosis:'',
+    oxi:'',
+    codeTras:'',
+    hospital:'',
+    medRec:'',
+    serviceC:'',
+    serviceM:'',
+    operator:'',
+    tUM1:'',
+    tUM2:'',
   });
   const sigCanvasRef = useRef<SignatureCanvas>(null);
 // Refs
@@ -56,27 +92,144 @@ const [isDrawing, setIsDrawing] = useState(false);
     const { width, height } = page.getSize();
 
     // 3. Embed a font
-    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     // 4. Draw text fields at positions matching your template
-    page.drawText(`Fecha: ${formData.date}`, { x: 50, y: height - 100, size: 12, font: helveticaFont, color: rgb(0, 0, 0) });
-    page.drawText(`Unidad Nº: ${formData.unit}`, { x: 50, y: height - 120, size: 12, font: helveticaFont });
-    page.drawText(`Turno: ${formData.shift}`, { x: 50, y: height - 140, size: 12, font: helveticaFont });
+   // First, ensure you have the logo image added to your PDF
+// (Assuming you've loaded the logo image as 'logoImage')
+const logoHeight = 50;
+const margin = 50;
+let currentY = height - margin - logoHeight;
 
-    // Horarios
-    let yPos = height - 180;
-    Object.entries(formData.times).forEach(([k, v]) => {
-      page.drawText(`H. ${k}: ${v}`, { x: 70, y: yPos, size: 12, font: helveticaFont });
-      yPos -= 20;
-    });
 
-    // Transporte y datos básicos
-    page.drawText(`Transporte: ${formData.transport}`, { x: 50, y: yPos - 10, size: 12, font: helveticaFont });
-    page.drawText(`Ubicación: ${formData.location}`, { x: 50, y: yPos - 40, size: 12, font: helveticaFont });
-    page.drawText(`Nombre: ${formData.name}`, { x: 50, y: yPos - 60, size: 12, font: helveticaFont });
-    page.drawText(`Dirección: ${formData.address}`, { x: 50, y: yPos - 80, size: 12, font: helveticaFont });
-    page.drawText(`Edad: ${formData.age}`, { x: 50, y: yPos - 100, size: 12, font: helveticaFont });
-    page.drawText(`Sexo: ${formData.sex}`, { x: 50, y: yPos - 120, size: 12, font: helveticaFont });
+
+// Add title
+currentY -= 70; // Space after logo
+page.drawText('AmbulanciasTVR - Reporte Médico', {
+  x: margin,
+  y: currentY,
+  size: 24,
+  font: helveticaFont,
+  color: rgb(0, 0.2, 0.4), // Dark blue color
+});
+
+// Add decorative line under title
+currentY -= 20;
+page.drawLine({
+  start: { x: margin, y: currentY },
+  end: { x: width - margin, y: currentY },
+  thickness: 2,
+  color: rgb(0, 0.2, 0.4),
+});
+
+// Section styles
+const sectionTitleStyle = {
+  font: helveticaFont,
+  size: 14,
+  color: rgb(0, 0.2, 0.4),
+};
+const subsectionTitleStyle = {
+  font: helveticaFont,
+  size: 12,
+};
+const normalTextStyle = {
+  font: helveticaFont,
+  size: 12,
+};
+
+// Create helper function for section titles
+const addSectionTitle = (text:any, y:any) => {
+  page.drawText(text, { ...sectionTitleStyle, x: margin, y });
+  return y - 30; // Return new Y position
+};
+
+// Create two-column layout helper
+interface TwoColumnOptions {
+  spacing?: number;
+  rightX?: number;
+  style?: any; // Replace 'any' with your specific text style type if available
+}
+
+const twoColumns = (
+  leftText: string,
+  rightText: string,
+  y: number,
+  opts: TwoColumnOptions = {}
+) => {
+  const rightX = opts.rightX ?? width - margin - 200;
+  page.drawText(leftText, { ...opts.style, x: margin, y });
+  page.drawText(rightText, { ...opts.style, x: rightX, y });
+  return y - (opts.spacing ?? 20);
+};
+
+// Header Information
+currentY = addSectionTitle('Información Básica', currentY - 20);
+currentY = twoColumns(`Fecha: ${formData.date}`, `Unidad Nº: ${formData.unit}`, currentY, {
+  style: normalTextStyle
+});
+currentY = twoColumns(`Turno: ${formData.shift}`, `Transporte: ${formData.transport}`, currentY, {
+  style: normalTextStyle
+});
+
+// Times Section
+currentY = addSectionTitle('Horarios', currentY - 20);
+let yPos = currentY;
+Object.entries(formData.times).forEach(([k, v]) => {
+  page.drawText(`• ${k}: ${v}`, { ...normalTextStyle, x: margin + 20, y: yPos });
+  yPos -= 20;
+});
+currentY = yPos - 20;
+
+// Patient Information Section
+currentY = addSectionTitle('Detalles del paciente', currentY);
+currentY = twoColumns(`Nombre: ${formData.name}`, `Edad: ${formData.age}`, currentY, {
+  style: normalTextStyle
+});
+currentY = twoColumns(`Dirección: ${formData.address}`, `Sexo: ${formData.sex}`, currentY, {
+  style: normalTextStyle
+});
+currentY = twoColumns(`Ubicación: ${formData.location}`, `Tipo de Sangre: ${formData.bloodType}`, currentY, {
+  style: normalTextStyle
+});
+
+// Additional Data Section with grid layout
+currentY = addSectionTitle('Información Adicional', currentY - 20);
+const additionalData = [
+  [`Tipo de llamada: ${formData.callType}`, `Estado Civil: ${formData.civilStatus}`],
+  [`Derechohabiente: ${formData.beneficiary}`, `Profesión: ${formData.profession}`],
+  [`Adulto responsable: ${formData.responsibleAdult}`, `Relación: ${formData.relationship}`],
+  [`Teléfono: ${formData.phone}`, `Oximetría: ${formData.vitals}%`],
+];
+
+
+additionalData.forEach(([left, right]) => {
+  currentY = twoColumns(left, right, currentY, { style: normalTextStyle });
+});
+
+
+currentY = addSectionTitle('Información Adicional', currentY - 20);
+const additionalDato = [
+  [`Tipo de llamada: ${formData.callType}`, `Estado Civil: ${formData.civilStatus}`],
+  [`Derechohabiente: ${formData.beneficiary}`, `Profesión: ${formData.profession}`],
+  [`Adulto responsable: ${formData.responsibleAdult}`, `Relación: ${formData.relationship}`],
+  [`Teléfono: ${formData.phone}`, `Oximetría: ${formData.vitals}`],
+];
+
+
+additionalDato.forEach(([left, right]) => {
+  currentY = twoColumns(left, right, currentY, { style: normalTextStyle });
+});
+
+// Continue with other sections using similar pattern...
+
+// Add footer
+page.drawText('Confidential Medical Document', {
+  x: margin,
+  y: 40,
+  size: 10,
+  font: helveticaFont,
+  color: rgb(0.5, 0.5, 0.5),
+});
 
     // 5. Embed signature image if exists
     const canvas = sigCanvasRef.current;
@@ -120,7 +273,7 @@ const [isDrawing, setIsDrawing] = useState(false);
         </label>
         <label className="flex flex-col">
           <span className="mb-1">Turno</span>
-           <label className="flex flex-col"><select name="shift" onChange={handleChange} className="p-2 border rounded"><option value="Mañana">Mañana</option><option value="Tarde">Tarde</option><option value="Noche">Noche</option></select></label>
+           <label className="flex flex-col"><select name="shift" onChange={handleChange} className="p-2 border rounded"><option value="Mañana">Mañana</option><option value="Tarde">Tarde</option><option value="Tarde">Noche</option></select></label>
         </label>
       </div>
 
@@ -149,6 +302,9 @@ const [isDrawing, setIsDrawing] = useState(false);
         </div>
       </fieldset>
 
+
+
+
       {/* Datos básicos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <label className="flex flex-col"><span>Ubicación</span><input type="text" name="location" onChange={handleChange} className="p-2 border rounded" /></label>
@@ -158,70 +314,61 @@ const [isDrawing, setIsDrawing] = useState(false);
         <label className="flex flex-col"><span>Sexo</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="M">M</option><option value="F">F</option></select></label>
       </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
-        <div className="mb-6">
-  <span className="block font-semibold mb-1">Señalamiento de Heridas:</span>
-  <div className="relative border rounded overflow-hidden" style={{width: '650px', height: '650px'}}>
- 
-    <canvas
-      ref={drawingCanvasRef}
-      width={650}
-      height={650}
-      className="w-full z-20 h-full"
-      onMouseDown={(e) => {
-        const canvas = drawingCanvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+          <fieldset className="mb-4">
+        <legend className="font-semibold">Estado Civil</legend>
+        <div className="flex flex-wrap gap-4">
+          {['Soltero','Casado','Divorciado','Viudo', 'Union Libre '].map(opt => (
+            <label key={opt} className="flex items-center">
+              <input type="radio" name="civilStatus" value={opt} onChange={handleChange} className="mr-2" />{opt}
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
-        // Calcular escala correcta
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+          {/* Datos básicos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <label className="flex flex-col"><span>Tipo de llamada</span><input type="text" name="callType" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Profesión</span><input type="text" name="profession" onChange={handleChange} className="p-2 border rounded" /></label>
+      </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
-        const startX = (e.clientX - rect.left) * scaleX;
-        const startY = (e.clientY - rect.top) * scaleY;
 
-        // Configurar estilo del pincel
-        ctx.strokeStyle = '#ff0000';
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
 
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
+          <fieldset className="mb-4">
+        <legend className="font-semibold">Tipo de Sangre</legend>
+        <div className="flex flex-wrap gap-4">
+          {['A+','A-','O+','O-','B+','B-','AB+','AB-'].map(opt => (
+            <label key={opt} className="flex items-center">
+              <input type="radio" name="bloodType" value={opt} onChange={handleChange} className="mr-2" />{opt}
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
-        const draw = (moveEvent: MouseEvent) => {
-          const moveX = (moveEvent.clientX - rect.left) * scaleX;
-          const moveY = (moveEvent.clientY - rect.top) * scaleY;
-          
-          ctx.lineTo(moveX, moveY);
-          ctx.stroke();
-        };
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <label className="flex flex-col"><span>Adulto Responsable</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Relación</span><input type="text" name="relationship" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Teléfono</span><input type="number" name="phone" onChange={handleChange} className="p-2 border rounded" /></label>
+      </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
-        const stopDrawing = () => {
-          window.removeEventListener('mousemove', draw);
-          window.removeEventListener('mouseup', stopDrawing);
-        };
+   <fieldset className="mb-4">
+        <legend className="font-semibold">Derechohabiente</legend>
+        <div className="flex flex-wrap gap-4">
+          {['MediChihuahua','Imss','Issste','Pensiones del estado','Pensiones Municipales','Militar',' Privado'].map(opt => (
+            <label key={opt} className="flex items-center">
+              <input type="radio" name="beneficiary" value={opt} onChange={handleChange} className="mr-2" />{opt}
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
-        window.addEventListener('mousemove', draw);
-        window.addEventListener('mouseup', stopDrawing);
-      }}
-    />
-     
-  </div>
-  <button
-    onClick={() => {
-      const canvas = drawingCanvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }}
-    className="mt-2 px-4 py-2 border hover:bg-blue-600 rounded"
-  >
-    Borrar dibujo
-  </button>
-</div>
+
+
+
+
+
+
+
+       
       {/* Signature pad */}
       <div className="mb-4">
         <span className="block font-semibold mb-1">Firma:</span>
