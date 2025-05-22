@@ -234,7 +234,7 @@ page.drawText('Confidential Medical Document', {
     // 5. Embed signature image if exists
     const canvas = sigCanvasRef.current;
     if (canvas && !canvas.isEmpty()) {
-      const sigDataUrl = canvas.getTrimmedCanvas().toDataURL('image/png');
+      const sigDataUrl = canvas.getCanvas().toDataURL('image/png');
       const sigBytes = await fetch(sigDataUrl).then(res => res.arrayBuffer());
       const sigImage = await pdfDoc.embedPng(sigBytes);
       const sigDims = sigImage.scale(0.5);
@@ -269,7 +269,7 @@ page.drawText('Confidential Medical Document', {
         </label>
         <label className="flex flex-col">
           <span className="flex items-center mb-1"><Hash className="mr-1" size={16}/> Unidad Nº</span>
-          <input type="number" name="unit" onChange={handleChange} className="p-2 border rounded" />
+          <input type="number" inputMode="numeric" pattern="[0-9]*" name="unit" onChange={handleChange} className="p-2 border rounded" />
         </label>
         <label className="flex flex-col">
           <span className="mb-1">Turno</span>
@@ -310,7 +310,7 @@ page.drawText('Confidential Medical Document', {
         <label className="flex flex-col"><span>Ubicación</span><input type="text" name="location" onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Nombre</span><input type="text" name="name" onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col md:col-span-2"><span>Dirección</span><input type="text" name="address" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col"><span>Edad</span><input type="number" name="age" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Edad</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="age" onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Sexo</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="M">M</option><option value="F">F</option></select></label>
       </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
@@ -347,7 +347,7 @@ page.drawText('Confidential Medical Document', {
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <label className="flex flex-col"><span>Adulto Responsable</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Relación</span><input type="text" name="relationship" onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col"><span>Teléfono</span><input type="number" name="phone" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Teléfono</span><input type="tel" inputMode="numeric" pattern="[0-9]*" name="phone" onChange={handleChange} className="p-2 border rounded" /></label>
       </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
    <fieldset className="mb-4">
@@ -362,8 +362,61 @@ page.drawText('Confidential Medical Document', {
       </fieldset>
 
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <label className="flex flex-col"><span>Presión Arterial</span><input type="text" name="arterialPress" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Pulso</span><input type="number" inputMode="numeric" pattern="[0-9]*" name='pulse' onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Oximetría</span><input type="number" inputMode="numeric" pattern="[0-9]*" name='oxi'  onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Temperatura</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="temperature" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col "><span>Respiración</span><input type="text" name="respiration" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col "><span>Alergias</span><input type="text" name="address" onChange={handleChange} className="p-2 border rounded" /></label>
+        
+        <label className="flex flex-col"><span>Respiración</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Normal</option><option value="Superficial">Superficial</option></select></label>
+        <label className="flex flex-col"><span>Hemorragias</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Ninguna</option><option value="Min.">Min.</option><option value="Mod.">Mod.</option><option value="Sev.">Sev.</option></select></label>
+        <label className="flex flex-col"><span>Dolor</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normal">Ninguna</option><option value="Min.">Min.</option><option value="Mod.">Mod.</option><option value="Sev.">Sev.</option></select></label>
+      
+        <label className="flex flex-col "><span>Prioridad</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Rojo">Rojo</option><option value="Amarillo">Amarillo</option><option value="Verde">Verde</option><option value="Negro">Negro</option></select></label>
+          <label className="flex flex-col  md:col-span-2"><span>Molestia Principal</span><input type="text" name="address" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col  md:col-span-2"><span>Descripción de la lesión</span><input type="text" name="address" onChange={handleChange} className="p-2 border rounded" /></label>
+        
+      </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
+         
+   <fieldset className="mb-4">
+        <legend className="font-semibold">Nivel de Conciencia</legend>
+        <div className="flex flex-wrap gap-4">
+          {['Alerta','Responde al estimulo verbal','Respondo al estimulo doloroso','No responde'].map(opt => (
+            <label key={opt} className="flex items-center">
+              <input type="radio" name="beneficiary" value={opt} onChange={handleChange} className="mr-2" />{opt}
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <label className="flex flex-col"><span>Ruidos Respiratorios</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normales">Normales</option><option value="Estertores">Estertores</option><option value="Estridor">Estridor</option><option value="Roncus">Roncus</option><option value="Sibilancias">Sibilancias</option></select></label>
+        <label className="flex flex-col"><span>Pupilas</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="Normales">Normales</option><option value="Dilatadas">Dilatadas</option><option value="Contraidas">Contraidas</option><option value="Asimétricas">Asimétricas</option></select></label>
+
+   <label className="flex flex-col md:col-span-2"><span>Primeros Auxilios</span><input type="text" placeholder='R.C.P, Vendajes, ETC...' name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+   <label className="flex flex-col"><span>O2</span><select name="sex" onChange={handleChange} className="p-2 border rounded"><option value="No">No</option><option value="Sí">Sí</option></select></label>
+  <label className="flex flex-col"><span>Medicamentos</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Dosis</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Hora</span><input type="time" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        
+        <label className="flex flex-col"><span>Código de traslado al Hospital</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+
+<label className="flex flex-col"><span>Hospital</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+
+</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            
+        <label className="flex flex-col"><span>Jefe de Servicios</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+
+        <label className="flex flex-col"><span>T. UM</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+
+        <label className="flex flex-col"><span>T. UM</span><input type="text" name="responsibleAdult" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Médico</span><input type="text" name="relationship" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Operador</span><input type="text"  name="phone" onChange={handleChange} className="p-2 border rounded" /></label>
+      </div>{/* (igual que antes: date, unit, shift, horarios, transporte, datos) */}
 
 
 
@@ -372,14 +425,22 @@ page.drawText('Confidential Medical Document', {
       {/* Signature pad */}
       <div className="mb-4">
         <span className="block font-semibold mb-1">Firma:</span>
-        <SignatureCanvas penColor="black" canvasProps={{ className: 'border rounded w-full', style: { height: 200 } }} ref={sigCanvasRef} />
+        <SignatureCanvas
+  penColor="black"
+  ref={sigCanvasRef}
+  canvasProps={{
+    width: 500, // definido en píxeles
+    height: 200,
+    className: 'border rounded'
+  }}
+/>
         <button onClick={clearSignature} className="mt-2 px-4 py-2 hover:bg-blue-600  border rounded">Borrar firma</button>
       </div>
 
       {/* Botón para generar PDF */}
       <div className="text-right">
         <button onClick={handleGeneratePDF} className="px-4 py-2 bg-blue-600 text-white rounded-2xl shadow hover:bg-blue-700 focus:outline-none focus:ring">
-          Generar PDF desde plantilla
+          Generar PDF
         </button>
       </div>
     </motion.div>
