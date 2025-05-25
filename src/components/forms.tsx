@@ -720,7 +720,7 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
     a.click();
     URL.revokeObjectURL(url);
 
-      window.location.reload()
+     
 
 
   };
@@ -1049,7 +1049,9 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
       {/* Botón para generar PDF */}
     
       <div className="text-right">
-        
+        <button onClick={() => window.location.reload()} className="px-4 mr-4 py-2 bg-blue-600 text-white rounded-2xl shadow hover:bg-blue-700 focus:outline-none focus:ring">
+          Resetear PDF
+        </button>
         <button onClick={handleGeneratePDF} className="px-4 py-2 bg-blue-600 text-white rounded-2xl shadow hover:bg-blue-700 focus:outline-none focus:ring">
           Generar PDF
         </button>
