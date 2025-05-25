@@ -727,7 +727,7 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
 
 
   return (
-    <motion.div className="p-4 max-w-3xl mx-auto bg-white shadow-md rounded-2xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+    <motion.div className="p-4 max-w-3xl pb-6 mx-auto bg-white shadow-md rounded-2xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <h1 className="text-2xl font-bold mb-4">Formulario de Paciente - Ambulancias TVR</h1>
 
       {/* Campos del formulario */}
