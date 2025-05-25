@@ -625,12 +625,10 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
 
 
 
-    if (selectedFile) {
-  // Cargamos los bytes de la imagen
+ if (selectedFile) {
   const imgBytes = await selectedFile.arrayBuffer();
   let embeddedImage: PDFImage;
-  
-  // Seleccionamos el método de embed según el tipo real
+
   if (selectedFile.type === 'image/jpeg' || selectedFile.type === 'image/jpg') {
     embeddedImage = await pdfDoc.embedJpg(imgBytes);
   } else if (selectedFile.type === 'image/png') {
@@ -639,23 +637,22 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
     throw new Error(`Tipo de imagen no soportado: ${selectedFile.type}`);
   }
 
-  // Escalamos la imagen para que ocupe un 20% de su tamaño original
-  const scaleFactor = 0.2;
-  const { width, height } = embeddedImage.size();
-  const imgDims = {
-    width: width * scaleFactor,
-    height: height * scaleFactor,
-  };
+  // Altura fija en puntos PDF
+  const fixedHeight = 720;
+  // Dimensiones originales
+  const { width: origW, height: origH } = embeddedImage.size();
+  // Factor de escala según la nueva altura
+  const scale = fixedHeight / origH;
+  // Ancho proporcional
+  const fixedWidth = origW * scale;
 
-  // La dibujamos en la página (ajusta x, y según tus necesidades)
   page3.drawImage(embeddedImage, {
     x: 40,
     y: 200,
-    width: imgDims.width,
-    height: imgDims.height,
+    width: fixedWidth,
+    height: fixedHeight,
   });
 }
-
 
 
 
