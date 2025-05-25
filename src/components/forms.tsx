@@ -636,7 +636,7 @@ if (selectedFile) {
   });
 
   // Fija la altura deseada
-  const fixedHeight = 400; // en píxeles
+  const fixedHeight = 250; // en píxeles
   const aspectRatio = img.width / img.height;
   const fixedWidth = fixedHeight * aspectRatio;
 
