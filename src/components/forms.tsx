@@ -6,7 +6,7 @@ import { Calendar, Clock, Hash } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import { PDFDocument, rgb, StandardFonts, PDFImage } from 'pdf-lib';
 
-
+import imageCompression from 'browser-image-compression';
 
 
 export default function ReportForm() {
@@ -626,54 +626,34 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
 
 
 if (selectedFile) {
-  // 1) Carga la imagen en un elemento HTMLImageElement
-  const imgUrl = URL.createObjectURL(selectedFile);
-  const img = new Image();
-  img.src = imgUrl;
-  await new Promise((res, rej) => {
-    img.onload  = () => res(true);
-    img.onerror = () => rej(new Error('No se pudo cargar la imagen'));
-  });
+  // 1) Comprime y redimensiona manteniendo proporción: altura máxima 720px
+  const options = {
+    maxHeightOrWidth: 100,      // se aplica a la dimensión más grande
+    useWebWorker: true,         // para no bloquear el hilo UI
+    maxSizeMB: 1,               // opcional: límite de tamaño final
+    initialQuality: 0.8,        // opcional: calidad JPEG
+    alwaysKeepResolution: false // permite cambiar resolución
+  };
+  const compressedFile = await imageCompression(selectedFile, options);
 
-  // 2) Crea un canvas con la altura fija en píxeles
-  //    Nota: 1 pt ≈ 1.333 px en canvas, pero aquí puedes tratar
-  //    720 pt como 720 px para mantener proporción en el PDF.
-  const fixedHeightPx = 720;
-  const scale = fixedHeightPx / img.height;
-  const fixedWidthPx  = img.width * scale;
-
-  const canvas = document.createElement('canvas');
-  canvas.width  = fixedWidthPx;
-  canvas.height = fixedHeightPx;
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(img, 0, 0, fixedWidthPx, fixedHeightPx);
-
-  // 3) Convierte el canvas a Blob y luego a ArrayBuffer
-  const blob: Blob = await new Promise((resolve) =>
-    canvas.toBlob(resolve as any, selectedFile.type)
-  );
-  const resizedBytes = await blob.arrayBuffer();
-
-  // 4) Embed de la imagen ya redimensionada en el PDF
+  // 2) Extrae bytes y embebe en el PDF
+  const imgBytes = await compressedFile.arrayBuffer();
   let embeddedImage: PDFImage;
-  if (selectedFile.type.startsWith('image/jpeg')) {
-    embeddedImage = await pdfDoc.embedJpg(resizedBytes);
-  } else {
-    embeddedImage = await pdfDoc.embedPng(resizedBytes);
+  if (compressedFile.type.startsWith('image/jpeg')) {
+    embeddedImage = await pdfDoc.embedJpg(imgBytes);
+  } else /* png */ {
+    embeddedImage = await pdfDoc.embedPng(imgBytes);
   }
 
-  // 5) Dibuja en la página con las dimensiones proporcionales
+  // 3) Tamaño resultante: la librería ya ajustó altura <=720px y ancho proporcional
+  const { width, height } = embeddedImage.size();
   page3.drawImage(embeddedImage, {
     x: 40,
     y: 200,
-    width: fixedWidthPx,
-    height: fixedHeightPx,
+    width,
+    height,
   });
-
-  // Limpieza
-  URL.revokeObjectURL(imgUrl);
 }
-
 
 
 
