@@ -403,7 +403,7 @@ const twoColumns2 = (
 
 // Additional Data Section with grid layout
 
-const glas = formData.ao + formData.rm + formData.rv;
+const glas = Number(formData.ao) + Number(formData.rm) + Number(formData.rv);
 
 function splitTextByLength(text: string): string[] {
   const length = text.length;
@@ -847,7 +847,8 @@ if (selectedFile) {
         <label className="flex flex-col"><span>Presión Arterial</span><input type="text" name="arterialPress" onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Pulso</span><input type="number" inputMode="numeric" pattern="[0-9]*" name='pulse' onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Oximetría</span><input type="number" inputMode="numeric" pattern="[0-9]*" name='oxi'  onChange={handleChange} className="p-2 border rounded" /></label>
-        <label className="flex flex-col"><span>Temperatura</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="temperature" onChange={handleChange} className="p-2 border rounded" /></label>
+        <label className="flex flex-col"><span>Temperatura</span><input type='number'  inputMode="decimal" 
+  pattern="[0-9]+([.,][0-9]+)?"  name="temperature" onChange={handleChange} className="p-2 border rounded" /></label>
         <label className="flex flex-col"><span>Dextrostix</span><input type="number" inputMode="numeric" pattern="[0-9]*" name="dex" onChange={handleChange} className="p-2 border rounded" /></label>
         
         <label className="flex flex-col "><span>Alergias</span><input type="text" name="alergies" onChange={handleChange} className="p-2 border rounded" /></label>
