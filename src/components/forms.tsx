@@ -625,35 +625,54 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
 
 
 
- if (selectedFile) {
-  const imgBytes = await selectedFile.arrayBuffer();
-  let embeddedImage: PDFImage;
+if (selectedFile) {
+  // 1) Carga la imagen en un elemento HTMLImageElement
+  const imgUrl = URL.createObjectURL(selectedFile);
+  const img = new Image();
+  img.src = imgUrl;
+  await new Promise((res, rej) => {
+    img.onload  = () => res(true);
+    img.onerror = () => rej(new Error('No se pudo cargar la imagen'));
+  });
 
-  if (selectedFile.type === 'image/jpeg' || selectedFile.type === 'image/jpg') {
-    embeddedImage = await pdfDoc.embedJpg(imgBytes);
-  } else if (selectedFile.type === 'image/png') {
-    embeddedImage = await pdfDoc.embedPng(imgBytes);
+  // 2) Crea un canvas con la altura fija en píxeles
+  //    Nota: 1 pt ≈ 1.333 px en canvas, pero aquí puedes tratar
+  //    720 pt como 720 px para mantener proporción en el PDF.
+  const fixedHeightPx = 720;
+  const scale = fixedHeightPx / img.height;
+  const fixedWidthPx  = img.width * scale;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = fixedWidthPx;
+  canvas.height = fixedHeightPx;
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, fixedWidthPx, fixedHeightPx);
+
+  // 3) Convierte el canvas a Blob y luego a ArrayBuffer
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob(resolve as any, selectedFile.type)
+  );
+  const resizedBytes = await blob.arrayBuffer();
+
+  // 4) Embed de la imagen ya redimensionada en el PDF
+  let embeddedImage: PDFImage;
+  if (selectedFile.type.startsWith('image/jpeg')) {
+    embeddedImage = await pdfDoc.embedJpg(resizedBytes);
   } else {
-    throw new Error(`Tipo de imagen no soportado: ${selectedFile.type}`);
+    embeddedImage = await pdfDoc.embedPng(resizedBytes);
   }
 
-  // Altura fija en puntos PDF
-  const fixedHeight = 720;
-  // Dimensiones originales
-  const { width: origW, height: origH } = embeddedImage.size();
-  // Factor de escala según la nueva altura
-  const scale = fixedHeight / origH;
-  // Ancho proporcional
-  const fixedWidth = origW * scale;
-
+  // 5) Dibuja en la página con las dimensiones proporcionales
   page3.drawImage(embeddedImage, {
     x: 40,
     y: 200,
-    width: fixedWidth,
-    height: fixedHeight,
+    width: fixedWidthPx,
+    height: fixedHeightPx,
   });
-}
 
+  // Limpieza
+  URL.revokeObjectURL(imgUrl);
+}
 
 
 
