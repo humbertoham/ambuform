@@ -2,11 +2,10 @@
 
 import React, { useState, useRef, ChangeEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, Hash } from 'lucide-react';
+import {  Clock, Hash } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import { PDFDocument, rgb, StandardFonts, PDFImage } from 'pdf-lib';
 
-import imageCompression from 'browser-image-compression';
 
 
 export default function ReportForm() {
@@ -626,36 +625,49 @@ currentY3 = addSectionTitle3('Evidencia', currentY3 - 20);
 
 
 if (selectedFile) {
-  // 1) Comprime y redimensiona manteniendo proporción: altura máxima 720px
-  const options = {
-    maxHeightOrWidth: 100,      // se aplica a la dimensión más grande
-    useWebWorker: true,         // para no bloquear el hilo UI
-    maxSizeMB: 1,               // opcional: límite de tamaño final
-    initialQuality: 0.8,        // opcional: calidad JPEG
-    alwaysKeepResolution: false // permite cambiar resolución
-  };
-  const compressedFile = await imageCompression(selectedFile, options);
+  // Carga la imagen
+  const imgUrl = URL.createObjectURL(selectedFile);
+  const img = new Image();
+  img.src = imgUrl;
 
-  // 2) Extrae bytes y embebe en el PDF
-  const imgBytes = await compressedFile.arrayBuffer();
-  let embeddedImage: PDFImage;
-  if (compressedFile.type.startsWith('image/jpeg')) {
-    embeddedImage = await pdfDoc.embedJpg(imgBytes);
-  } else /* png */ {
-    embeddedImage = await pdfDoc.embedPng(imgBytes);
-  }
+  await new Promise((res, rej) => {
+    img.onload = () => res(true);
+    img.onerror = rej;
+  });
 
-  // 3) Tamaño resultante: la librería ya ajustó altura <=720px y ancho proporcional
+  // Fija la altura deseada
+  const fixedHeight = 100; // en píxeles
+  const aspectRatio = img.width / img.height;
+  const fixedWidth = fixedHeight * aspectRatio;
+
+  // Redibuja la imagen redimensionada en un canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = fixedWidth;
+  canvas.height = fixedHeight;
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, fixedWidth, fixedHeight);
+
+  // Convierte a blob JPEG (para reducir tamaño real)
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.8)
+  );
+  const imgBytes = await blob.arrayBuffer();
+
+  // Embebe la imagen redimensionada real (no zoom, no grande)
+  const embeddedImage = await pdfDoc.embedJpg(imgBytes);
   const { width, height } = embeddedImage.size();
+
+  // Dibuja en el PDF con las dimensiones reales
   page3.drawImage(embeddedImage, {
     x: 40,
     y: 200,
     width,
     height,
   });
+
+  // Limpieza
+  URL.revokeObjectURL(imgUrl);
 }
-
-
 
 
 
