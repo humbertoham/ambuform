@@ -636,7 +636,7 @@ if (selectedFile) {
   });
 
   // Fija la altura deseada
-  const fixedHeight = 100; // en píxeles
+  const fixedHeight = 400; // en píxeles
   const aspectRatio = img.width / img.height;
   const fixedWidth = fixedHeight * aspectRatio;
 
@@ -660,7 +660,7 @@ if (selectedFile) {
   // Dibuja en el PDF con las dimensiones reales
   page3.drawImage(embeddedImage, {
     x: 40,
-    y: 200,
+    y: 150,
     width,
     height,
   });
