@@ -2,10 +2,10 @@
 
 import React, { useState, useRef, ChangeEvent } from 'react';
 import { motion } from 'framer-motion';
-import {  Clock, Hash } from 'lucide-react';
+import {  Clock, Hash, ArrowRight } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
-import { PDFDocument, rgb, StandardFonts, PDFImage } from 'pdf-lib';
-
+import { PDFDocument, rgb, StandardFonts} from 'pdf-lib';
+import Link from 'next/link';
 
 
 export default function ReportForm() {
@@ -739,6 +739,7 @@ if (selectedFile) {
 
   return (
     <motion.div className="p-4 max-w-3xl pb-6 mx-auto bg-white shadow-md rounded-2xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      <Link href='/responsiva' className='underline text-blue-600'> Responsiva <ArrowRight className='ml-2 inline' /></Link>
       <h1 className="text-2xl font-bold mb-4">Formulario de Paciente - Ambulancias TVR</h1>
 
       {/* Campos del formulario */}
