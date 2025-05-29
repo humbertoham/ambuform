@@ -516,7 +516,7 @@ if (selectedFile4) {
          <label className="flex flex-col"><span>Ine 2 por enfrente</span><input type="file"
         accept="image/*"
         onChange={handleFileChange3} className="p-2 border rounded" /></label>
-         <label className="flex flex-col"><span>Ine 2 por enfrente</span><input type="file"
+         <label className="flex flex-col"><span>Ine 2 por atrás</span><input type="file"
         accept="image/*"
         onChange={handleFileChange4} className="p-2 border rounded" /></label>
 
