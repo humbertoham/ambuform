@@ -11,6 +11,52 @@ import Link from 'next/link';
 export default function ResponsivaForm() {
   
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+    // Handle file input change
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files || e.target.files.length === 0) {
+        setSelectedFile(null);
+        return;
+      }
+      setSelectedFile(e.target.files[0]);
+    };
+  const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
+  
+    // Handle file input change
+    const handleFileChange2 = (e: ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files || e.target.files.length === 0) {
+        setSelectedFile2(null);
+        return;
+      }
+      setSelectedFile2(e.target.files[0]);
+    };
+  const [selectedFile3, setSelectedFile3] = useState<File | null>(null);
+  
+    // Handle file input change
+    const handleFileChange3 = (e: ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files || e.target.files.length === 0) {
+        setSelectedFile3(null);
+        return;
+      }
+      setSelectedFile3(e.target.files[0]);
+    };
+  
+  const [selectedFile4, setSelectedFile4] = useState<File | null>(null);
+  
+    // Handle file input change
+    const handleFileChange4 = (e: ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files || e.target.files.length === 0) {
+        setSelectedFile4(null);
+        return;
+      }
+      setSelectedFile4(e.target.files[0]);
+    };
+  
+
+
+
+
 
   const [formData, setFormData] = useState({
     unit:'',
@@ -134,6 +180,205 @@ Deslindando de cualquier responsabilidad a la Empresa y al Personal de Ambulanci
     // 4. Draw text fields at positions matching your template
    // First, ensure you have the logo image added to your PDF
 // (Assuming you've loaded the logo image as 'logoImage')
+
+
+
+if (selectedFile) {
+  // Carga la imagen
+  const imgUrl = URL.createObjectURL(selectedFile);
+  const img = new Image();
+  img.src = imgUrl;
+
+  await new Promise((res, rej) => {
+    img.onload = () => res(true);
+    img.onerror = rej;
+  });
+
+  // Fija la altura deseada
+  const fixedHeight = 50; // en píxeles
+  const aspectRatio = img.width / img.height;
+  const fixedWidth = fixedHeight * aspectRatio;
+
+  // Redibuja la imagen redimensionada en un canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = fixedWidth;
+  canvas.height = fixedHeight;
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, fixedWidth, fixedHeight);
+
+  // Convierte a blob JPEG (para reducir tamaño real)
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.8)
+  );
+  const imgBytes = await blob.arrayBuffer();
+
+  // Embebe la imagen redimensionada real (no zoom, no grande)
+  const embeddedImage = await pdfDoc.embedJpg(imgBytes);
+  const { width, height } = embeddedImage.size();
+
+  // Dibuja en el PDF con las dimensiones reales
+  page.drawImage(embeddedImage, {
+    x: 250,
+    y: 270,
+    width,
+    height,
+  });
+
+  // Limpieza
+  URL.revokeObjectURL(imgUrl);
+}
+
+if (selectedFile2) {
+  // Carga la imagen
+  const imgUrl = URL.createObjectURL(selectedFile2);
+  const img = new Image();
+  img.src = imgUrl;
+
+  await new Promise((res, rej) => {
+    img.onload = () => res(true);
+    img.onerror = rej;
+  });
+
+  // Fija la altura deseada
+  const fixedHeight = 50; // en píxeles
+  const aspectRatio = img.width / img.height;
+  const fixedWidth = fixedHeight * aspectRatio;
+
+  // Redibuja la imagen redimensionada en un canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = fixedWidth;
+  canvas.height = fixedHeight;
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, fixedWidth, fixedHeight);
+
+  // Convierte a blob JPEG (para reducir tamaño real)
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.8)
+  );
+  const imgBytes = await blob.arrayBuffer();
+
+  // Embebe la imagen redimensionada real (no zoom, no grande)
+  const embeddedImage = await pdfDoc.embedJpg(imgBytes);
+  const { width, height } = embeddedImage.size();
+
+  // Dibuja en el PDF con las dimensiones reales
+  page.drawImage(embeddedImage, {
+    x: 250,
+    y: 200,
+    width,
+    height,
+  });
+
+  // Limpieza
+  URL.revokeObjectURL(imgUrl);
+}
+
+if (selectedFile3) {
+  // Carga la imagen
+  const imgUrl = URL.createObjectURL(selectedFile3);
+  const img = new Image();
+  img.src = imgUrl;
+
+  await new Promise((res, rej) => {
+    img.onload = () => res(true);
+    img.onerror = rej;
+  });
+
+  // Fija la altura deseada
+  const fixedHeight = 50; // en píxeles
+  const aspectRatio = img.width / img.height;
+  const fixedWidth = fixedHeight * aspectRatio;
+
+  // Redibuja la imagen redimensionada en un canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = fixedWidth;
+  canvas.height = fixedHeight;
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, fixedWidth, fixedHeight);
+
+  // Convierte a blob JPEG (para reducir tamaño real)
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.8)
+  );
+  const imgBytes = await blob.arrayBuffer();
+
+  // Embebe la imagen redimensionada real (no zoom, no grande)
+  const embeddedImage = await pdfDoc.embedJpg(imgBytes);
+  const { width, height } = embeddedImage.size();
+
+  // Dibuja en el PDF con las dimensiones reales
+  page.drawImage(embeddedImage, {
+    x: 250,
+    y: 120,
+    width,
+    height,
+  });
+
+  // Limpieza
+  URL.revokeObjectURL(imgUrl);
+}
+
+if (selectedFile4) {
+  // Carga la imagen
+  const imgUrl = URL.createObjectURL(selectedFile4);
+  const img = new Image();
+  img.src = imgUrl;
+
+  await new Promise((res, rej) => {
+    img.onload = () => res(true);
+    img.onerror = rej;
+  });
+
+  // Fija la altura deseada
+  const fixedHeight = 50; // en píxeles
+  const aspectRatio = img.width / img.height;
+  const fixedWidth = fixedHeight * aspectRatio;
+
+  // Redibuja la imagen redimensionada en un canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = fixedWidth;
+  canvas.height = fixedHeight;
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, fixedWidth, fixedHeight);
+
+  // Convierte a blob JPEG (para reducir tamaño real)
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.8)
+  );
+  const imgBytes = await blob.arrayBuffer();
+
+  // Embebe la imagen redimensionada real (no zoom, no grande)
+  const embeddedImage = await pdfDoc.embedJpg(imgBytes);
+  const { width, height } = embeddedImage.size();
+
+  // Dibuja en el PDF con las dimensiones reales
+  page.drawImage(embeddedImage, {
+    x: 250,
+    y: 50,
+    width,
+    height,
+  });
+
+  // Limpieza
+  URL.revokeObjectURL(imgUrl);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -261,6 +506,21 @@ Deslindando de cualquier responsabilidad a la Empresa y al Personal de Ambulanci
 
        
       </div>
+
+       <label className="flex flex-col"><span>Ine 1 por enfrente</span><input type="file"
+        accept="image/*"
+        onChange={handleFileChange} className="p-2 border rounded" /></label>
+         <label className="flex flex-col"><span>Ine 1 por atrás</span><input type="file"
+        accept="image/*"
+        onChange={handleFileChange2} className="p-2 border rounded" /></label>
+         <label className="flex flex-col"><span>Ine 2 por enfrente</span><input type="file"
+        accept="image/*"
+        onChange={handleFileChange3} className="p-2 border rounded" /></label>
+         <label className="flex flex-col"><span>Ine 2 por enfrente</span><input type="file"
+        accept="image/*"
+        onChange={handleFileChange4} className="p-2 border rounded" /></label>
+
+
 
        
       {/* Signature pad */}
